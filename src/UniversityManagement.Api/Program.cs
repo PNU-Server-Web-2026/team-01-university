@@ -1,7 +1,7 @@
 using UniversityManagement.Api.Data;
 using UniversityManagement.Api.Common;
 using Microsoft.EntityFrameworkCore;
-
+using UniversityManagement.Api.Features.Cors;
 var builder = WebApplication.CreateBuilder(args);
 
 // Сервіси. Реєстрацію сервісів конкретних фіч додавайте через extension-методи
@@ -18,17 +18,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 
-var allowedOrigins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ?? Array.Empty<string>();
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("FrontPolicy", policy =>
-    {
-        policy.WithOrigins(allowedOrigins)
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
+
+builder.Services.AddCorsFeature(builder.Configuration);
 
 
 
@@ -42,7 +34,8 @@ if (app.Environment.IsDevelopment())
     // OpenAPI-документ: /openapi/v1.json
     app.MapOpenApi();
 }
-app.UseCors("FrontPolicy");
+
+app.UseCorsFeature();
 app.MapControllers();
 
 app.Run();
