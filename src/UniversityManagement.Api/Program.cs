@@ -1,6 +1,7 @@
 using UniversityManagement.Api.Data;
 using UniversityManagement.Api.Common;
 using Microsoft.EntityFrameworkCore;
+using UniversityManagement.Api.Features.Students;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +14,7 @@ builder.Services.AddOptions<UniversityOptions>()
     .BindConfiguration(UniversityOptions.SectionName)
     .ValidateDataAnnotations()
     .ValidateOnStart();
+builder.Services.AddStudentsFeature();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
