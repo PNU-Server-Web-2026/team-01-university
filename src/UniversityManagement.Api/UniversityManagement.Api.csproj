@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>UniversityManagement.Api</RootNamespace>
+    <TargetFramework>net10.0</TargetFramework>
     <!-- Дозволяє зберігати локальні секрети поза репозиторієм: dotnet user-secrets set ... -->
     <UserSecretsId>university-api</UserSecretsId>
   </PropertyGroup>
@@ -9,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="AspNetCore.HealthChecks.NpgSql" />
     <!--
       Явне посилання, щоб усі проєкти (включно з тестами) отримували ту саму версію EF Core,
       що й Microsoft.EntityFrameworkCore.Design (інакше Npgsql тягне старішу EF Core і буде MSB3277).
