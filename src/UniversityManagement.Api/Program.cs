@@ -2,8 +2,15 @@ using UniversityManagement.Api.Data;
 using UniversityManagement.Api.Features.Departments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddSerilog((serviceProvider, loggerConfiguration) =>
+    loggerConfiguration
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(serviceProvider)
+        .Enrich.FromLogContext());
 
 // Сервіси. Реєстрацію сервісів конкретних фіч додавайте через extension-методи
 // у папці фічі (наприклад, builder.Services.AddHotelsFeature();), див. CONTRIBUTING.md.
@@ -31,6 +38,8 @@ if (!string.IsNullOrEmpty(connectionString))
 var app = builder.Build();
 
 // HTTP-конвеєр.
+app.UseSerilogRequestLogging();
+
 if (app.Environment.IsDevelopment())
 {
     // OpenAPI-документ: /openapi/v1.json
