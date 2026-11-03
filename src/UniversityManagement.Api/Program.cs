@@ -1,5 +1,6 @@
 using UniversityManagement.Api.Data;
 using UniversityManagement.Api.Features.Departments;
+using UniversityManagement.Api.Features.Courses;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Serilog;
@@ -22,6 +23,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
 builder.Services.AddDepartmentsFeature();
+builder.Services.AddCoursesFeature();
 
 // Health Checks
 var connectionString = builder.Configuration.GetConnectionString("Default");
