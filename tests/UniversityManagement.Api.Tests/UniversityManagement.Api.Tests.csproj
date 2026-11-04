@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <RootNamespace>UniversityManagement.Api.Tests</RootNamespace>
-    <TargetFramework>net10.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
