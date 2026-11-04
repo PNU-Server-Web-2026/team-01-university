@@ -23,15 +23,11 @@ public interface IDepartmentService
     /// <summary>
     /// Оновити існуючу кафедру.
     /// </summary>
-    Task<DepartmentResponse?> UpdateAsync(int id, UpdateDepartmentRequest request, CancellationToken cancellationToken = default);
+    /// <returns><c>true</c>, якщо кафедру оновлено; <c>false</c>, якщо її не знайдено.</returns>
+    Task<bool> UpdateAsync(int id, UpdateDepartmentRequest request, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Видалити кафедру.
     /// </summary>
     Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Очистити всі дані (тільки для тестів).
-    /// </summary>
-    void Clear();
 }

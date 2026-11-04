@@ -21,7 +21,7 @@ public class DepartmentsController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<DepartmentResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<DepartmentResponse>>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<DepartmentResponse>>> GetAll(CancellationToken cancellationToken)
     {
         var departments = await _departmentService.GetAllAsync(cancellationToken);
         return Ok(departments);
@@ -30,10 +30,10 @@ public class DepartmentsController : ControllerBase
     /// <summary>
     /// GET /api/departments/{id} — отримати кафедру за ідентифікатором.
     /// </summary>
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(DepartmentResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<DepartmentResponse>> GetByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult<DepartmentResponse>> GetById(int id, CancellationToken cancellationToken)
     {
         var department = await _departmentService.GetByIdAsync(id, cancellationToken);
         if (department == null)
@@ -50,42 +50,42 @@ public class DepartmentsController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(DepartmentResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<DepartmentResponse>> CreateAsync(
+    public async Task<ActionResult<DepartmentResponse>> Create(
         [FromBody] CreateDepartmentRequest request,
         CancellationToken cancellationToken)
     {
         var department = await _departmentService.CreateAsync(request, cancellationToken);
-        return Created($"/api/departments/{department.Id}", department);
+        return CreatedAtAction(nameof(GetById), new { id = department.Id }, department);
     }
 
     /// <summary>
     /// PUT /api/departments/{id} — оновити кафедру.
     /// </summary>
-    [HttpPut("{id}")]
-    [ProducesResponseType(typeof(DepartmentResponse), StatusCodes.Status200OK)]
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<DepartmentResponse>> UpdateAsync(
+    public async Task<IActionResult> Update(
         int id,
         [FromBody] UpdateDepartmentRequest request,
         CancellationToken cancellationToken)
     {
-        var department = await _departmentService.UpdateAsync(id, request, cancellationToken);
-        if (department == null)
+        var updated = await _departmentService.UpdateAsync(id, request, cancellationToken);
+        if (!updated)
         {
             return NotFound();
         }
 
-        return Ok(department);
+        return NoContent();
     }
 
     /// <summary>
     /// DELETE /api/departments/{id} — видалити кафедру.
     /// </summary>
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var deleted = await _departmentService.DeleteAsync(id, cancellationToken);
         if (!deleted)
