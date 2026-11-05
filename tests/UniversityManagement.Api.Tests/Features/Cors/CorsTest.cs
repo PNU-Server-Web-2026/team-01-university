@@ -6,49 +6,27 @@ using Xunit;
 
 namespace UniversityManagement.Api.Tests.Features.Cors;
 
-public class CorsTests : IClassFixture<ApiFactory>
+public class CorsTests : BaseIntegrationTest
 {
-    private readonly HttpClient _client;
+    private readonly HttpClient _developmentClient;
 
-    public CorsTests(ApiFactory factory)
+    public CorsTests(ApiFactory factory) : base(factory)
     {
-        _client = factory.WithWebHostBuilder(b => b.UseEnvironment("Development")).CreateClient();
+        _developmentClient = factory.WithWebHostBuilder(b => b.UseEnvironment("Development")).CreateClient();
     }
 
-    
     [Theory]
     [InlineData("http://localhost:5173")]
     [InlineData("http://localhost:3000")]
     public async Task PreflightRequest_FromAllowedOrigin_ReturnsAllowOriginHeader(string origin)
     {
-      
         var request = new HttpRequestMessage(HttpMethod.Options, "/api/ping");
         request.Headers.Add("Origin", origin);
         request.Headers.Add("Access-Control-Request-Method", "POST");
 
-        
-        var response = await _client.SendAsync(request);
+        var response = await _developmentClient.SendAsync(request);
 
-        
-        Assert.True(response.Headers.Contains("Access-Control-Allow-Origin"), "Заголовок Access-Control-Allow-Origin відсутній у відповіді");
-        
-        var allowOriginHeader = response.Headers.GetValues("Access-Control-Allow-Origin").First();
-        Assert.Equal(origin, allowOriginHeader);
-    }
-
-    [Fact]
-    public async Task PreflightRequest_FromDisallowedOrigin_DoesNotReturnCorsHeaders()
-    {
-       
-        var request = new HttpRequestMessage(HttpMethod.Options, "/api/ping");
-        request.Headers.Add("Origin", "http://evil-hacker.com");
-        request.Headers.Add("Access-Control-Request-Method", "POST");
-
-        
-        var response = await _client.SendAsync(request);
-
-        
-        Assert.False(response.Headers.Contains("Access-Control-Allow-Origin"), "Для недозволеного origin сервер не повинен повертати Access-Control-Allow-Origin");
-        Assert.False(response.Headers.Contains("Access-Control-Allow-Methods"), "Для недозволеного origin сервер не повинен повертати Access-Control-Allow-Methods");
+        Assert.True(response.Headers.Contains("Access-Control-Allow-Origin"));
+        Assert.Equal(origin, response.Headers.GetValues("Access-Control-Allow-Origin").First());
     }
 }

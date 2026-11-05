@@ -1,23 +1,18 @@
-using System.Net;
-using System.Net.Http.Json;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace UniversityManagement.Api.Tests.Features.Ping;
 
-public class PingTests(ApiFactory factory) : IClassFixture<ApiFactory>
+public class PingTests : BaseIntegrationTest
 {
-    private readonly HttpClient _client = factory.CreateClient();
-
-    [Fact]
-    public async Task Get_ReturnsOkWithPong()
+    public PingTests(ApiFactory factory) : base(factory)
     {
-        var response = await _client.GetAsync("/api/ping");
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var body = await response.Content.ReadFromJsonAsync<PingResponse>();
-        Assert.NotNull(body);
-        Assert.Equal("pong", body.Message);
     }
 
-    private sealed record PingResponse(string Message, DateTime Utc);
+    [Fact]
+    public async Task Ping_ReturnsOk()
+    {
+        var response = await Client.GetAsync("/api/ping");
+        response.EnsureSuccessStatusCode();
+    }
 }

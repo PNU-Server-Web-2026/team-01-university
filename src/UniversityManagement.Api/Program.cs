@@ -1,11 +1,8 @@
 using UniversityManagement.Api.Data;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
 using UniversityManagement.Api.Features.Cors;
-=======
 using UniversityManagement.Api.Features.Students;
 
->>>>>>> feat/15/student-crud
 var builder = WebApplication.CreateBuilder(args);
 
 // Сервіси. Реєстрацію сервісів конкретних фіч додавайте через extension-методи
