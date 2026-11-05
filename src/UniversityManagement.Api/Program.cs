@@ -1,5 +1,7 @@
 using UniversityManagement.Api.Data;
 using Microsoft.EntityFrameworkCore;
+using UniversityManagement.Api.Features.Cors;
+using UniversityManagement.Api.Features.Students;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,11 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.AddStudentsFeature();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+
+
+
+builder.Services.AddCorsFeature(builder.Configuration);
+
+
+
+
 var app = builder.Build();
+
 
 // HTTP-конвеєр.
 if (app.Environment.IsDevelopment())
@@ -21,6 +33,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseCorsFeature();
 app.MapControllers();
 
 app.Run();
