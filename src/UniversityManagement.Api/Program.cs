@@ -1,5 +1,6 @@
 using UniversityManagement.Api.Data;
 using UniversityManagement.Api.Common;
+using UniversityManagement.Api.Features.Courses;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +17,8 @@ builder.Services.AddOptions<UniversityOptions>()
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
+
+builder.Services.AddCoursesFeature();
 
 var app = builder.Build();
 
