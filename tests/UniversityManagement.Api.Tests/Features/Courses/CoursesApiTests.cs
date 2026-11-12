@@ -54,10 +54,10 @@ public class CoursesApiTests : IClassFixture<ApiFactory>
 
         var location = response.Headers.Location;
         Assert.NotNull(location);
-        Assert.StartsWith("/api/courses/", location.ToString());
 
         var course = await response.Content.ReadFromJsonAsync<CourseResponse>();
         Assert.NotNull(course);
+        Assert.EndsWith($"/api/courses/{course.Id}", location.ToString());
         Assert.Equal("Introduction to Programming", course.Title);
         Assert.Equal("CS-101", course.Code);
         Assert.Equal(3, course.Credits);
@@ -108,7 +108,7 @@ public class CoursesApiTests : IClassFixture<ApiFactory>
     }
 
     [Fact]
-    public async Task Update_Existing_Returns200()
+    public async Task Update_Existing_Returns204()
     {
         // First create a course
         var createRequest = new CreateCourseRequest(
@@ -132,9 +132,10 @@ public class CoursesApiTests : IClassFixture<ApiFactory>
         );
         var response = await _client.PutAsJsonAsync($"/api/courses/{created.Id}", updateRequest);
 
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var course = await response.Content.ReadFromJsonAsync<CourseResponse>();
+        var getResponse = await _client.GetAsync($"/api/courses/{created.Id}");
+        var course = await getResponse.Content.ReadFromJsonAsync<CourseResponse>();
         Assert.NotNull(course);
         Assert.Equal(created.Id, course.Id);
         Assert.Equal("Advanced Database Systems", course.Title);

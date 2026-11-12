@@ -32,22 +32,24 @@ public class InMemoryCourseService : ICourseService
 
     public Task<CourseResponse?> UpdateAsync(int id, UpdateCourseRequest request, CancellationToken cancellationToken = default)
     {
-        if (!_courses.TryGetValue(id, out var existing))
+        while (_courses.TryGetValue(id, out var existing))
         {
-            return Task.FromResult<CourseResponse?>(null);
+            var updated = existing with
+            {
+                Title = request.Title,
+                Code = request.Code,
+                Credits = request.Credits,
+                Capacity = request.Capacity,
+                Semester = request.Semester
+            };
+
+            if (_courses.TryUpdate(id, updated, existing))
+            {
+                return Task.FromResult<CourseResponse?>(updated);
+            }
         }
 
-        var updated = existing with
-        {
-            Title = request.Title,
-            Code = request.Code,
-            Credits = request.Credits,
-            Capacity = request.Capacity,
-            Semester = request.Semester
-        };
-
-        _courses[id] = updated;
-        return Task.FromResult<CourseResponse?>(updated);
+        return Task.FromResult<CourseResponse?>(null);
     }
 
     public Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)

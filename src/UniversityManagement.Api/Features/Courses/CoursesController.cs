@@ -21,7 +21,7 @@ public class CoursesController : ControllerBase
     /// </summary>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<CourseResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<CourseResponse>>> GetAllAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<IEnumerable<CourseResponse>>> GetAll(CancellationToken cancellationToken)
     {
         var courses = await _courseService.GetAllAsync(cancellationToken);
         return Ok(courses);
@@ -30,10 +30,10 @@ public class CoursesController : ControllerBase
     /// <summary>
     /// GET /api/courses/{id} — отримати курс за ідентифікатором.
     /// </summary>
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<CourseResponse>> GetByIdAsync(int id, CancellationToken cancellationToken)
+    public async Task<ActionResult<CourseResponse>> GetById(int id, CancellationToken cancellationToken)
     {
         var course = await _courseService.GetByIdAsync(id, cancellationToken);
         if (course == null)
@@ -50,22 +50,22 @@ public class CoursesController : ControllerBase
     [HttpPost]
     [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<CourseResponse>> CreateAsync(
+    public async Task<ActionResult<CourseResponse>> Create(
         [FromBody] CreateCourseRequest request,
         CancellationToken cancellationToken)
     {
         var course = await _courseService.CreateAsync(request, cancellationToken);
-        return Created($"/api/courses/{course.Id}", course);
+        return CreatedAtAction(nameof(GetById), new { id = course.Id }, course);
     }
 
     /// <summary>
     /// PUT /api/courses/{id} — оновити курс.
     /// </summary>
-    [HttpPut("{id}")]
-    [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status200OK)]
+    [HttpPut("{id:int}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<CourseResponse>> UpdateAsync(
+    public async Task<IActionResult> Update(
         int id,
         [FromBody] UpdateCourseRequest request,
         CancellationToken cancellationToken)
@@ -76,16 +76,16 @@ public class CoursesController : ControllerBase
             return NotFound();
         }
 
-        return Ok(course);
+        return NoContent();
     }
 
     /// <summary>
     /// DELETE /api/courses/{id} — видалити курс.
     /// </summary>
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAsync(int id, CancellationToken cancellationToken)
+    public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         var deleted = await _courseService.DeleteAsync(id, cancellationToken);
         if (!deleted)
