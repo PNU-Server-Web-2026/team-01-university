@@ -1,5 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Serilog.Core;
+using UniversityManagement.Api.Tests.Features.Logging;
 
 namespace UniversityManagement.Api.Tests;
 
@@ -12,8 +15,15 @@ namespace UniversityManagement.Api.Tests;
 /// </summary>
 public class ApiFactory : WebApplicationFactory<Program>
 {
+    /// <summary>
+    /// Збирає всі події Serilog цього тестового хоста (через ReadFrom.Services).
+    /// </summary>
+    public CollectingSink LogSink { get; } = new();
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Testing");
+        builder.ConfigureServices(services =>
+            services.AddSingleton<ILogEventSink>(LogSink));
     }
 }
