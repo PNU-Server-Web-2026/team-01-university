@@ -1,7 +1,7 @@
 using UniversityManagement.Api.Data;
 using UniversityManagement.Api.Common;
 using Microsoft.EntityFrameworkCore;
-
+using UniversityManagement.Api.Features.Cors;
 var builder = WebApplication.CreateBuilder(args);
 
 // Сервіси. Реєстрацію сервісів конкретних фіч додавайте через extension-методи
@@ -17,7 +17,16 @@ builder.Services.AddOptions<UniversityOptions>()
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+
+
+
+builder.Services.AddCorsFeature(builder.Configuration);
+
+
+
+
 var app = builder.Build();
+
 
 // HTTP-конвеєр.
 if (app.Environment.IsDevelopment())
@@ -26,6 +35,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseCorsFeature();
 app.MapControllers();
 
 app.Run();
