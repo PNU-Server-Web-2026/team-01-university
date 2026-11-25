@@ -1,14 +1,21 @@
 using UniversityManagement.Api.Data;
-using UniversityManagement.Api.Features.Departments;
 using Microsoft.EntityFrameworkCore;
+using UniversityManagement.Api.Common;
+using UniversityManagement.Api.Data;
+using UniversityManagement.Api.Features.Departments;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Сервіси. Реєстрацію сервісів конкретних фіч додавайте через extension-методи
 // у папці фічі (наприклад, builder.Services.AddHotelsFeature();), див. CONTRIBUTING.md.
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.AddOptions<UniversityOptions>()
+    .BindConfiguration(UniversityOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
