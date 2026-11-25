@@ -1,4 +1,4 @@
-using UniversityManagement.Api.Data;
+
 using Microsoft.EntityFrameworkCore;
 using UniversityManagement.Api.Common;
 using UniversityManagement.Api.Data;
