@@ -1,4 +1,5 @@
 using UniversityManagement.Api.Data;
+using UniversityManagement.Api.Common;
 using Microsoft.EntityFrameworkCore;
 using UniversityManagement.Api.Features.Teachers;
 
@@ -7,6 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
+builder.Services.AddOptions<UniversityOptions>()
+    .BindConfiguration(UniversityOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 builder.Services.AddTeachersFeature();
 
