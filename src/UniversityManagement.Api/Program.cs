@@ -1,4 +1,5 @@
 using UniversityManagement.Api.Data;
+using UniversityManagement.Api.Features.Health;
 using UniversityManagement.Api.Common;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,8 @@ builder.Services.AddOptions<UniversityOptions>()
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+builder.Services.AddHealthFeature();
+
 var app = builder.Build();
 
 // HTTP-конвеєр.
@@ -27,6 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapControllers();
+app.MapHealthFeature();
 
 app.Run();
 
