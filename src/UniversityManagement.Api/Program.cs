@@ -1,6 +1,7 @@
-using UniversityManagement.Api.Data;
-using UniversityManagement.Api.Common;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+using UniversityManagement.Api.Common;
+using UniversityManagement.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +9,21 @@ var builder = WebApplication.CreateBuilder(args);
 // у папці фічі (наприклад, builder.Services.AddHotelsFeature();), див. CONTRIBUTING.md.
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
-builder.Services.AddOpenApi();
+
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Info = new()
+        {
+            Title = "University Management API",
+            Version = "v1",
+            Description = "API для управління університетом"
+        };
+        return Task.CompletedTask;
+    });
+});
+
 builder.Services.AddOptions<UniversityOptions>()
     .BindConfiguration(UniversityOptions.SectionName)
     .ValidateDataAnnotations()
@@ -24,6 +39,7 @@ if (app.Environment.IsDevelopment())
 {
     // OpenAPI-документ: /openapi/v1.json
     app.MapOpenApi();
+    app.MapScalarApiReference();
 }
 
 app.MapControllers();
