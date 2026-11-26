@@ -11,7 +11,7 @@ using UniversityManagement.Api.Data;
 namespace UniversityManagement.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20261126114653_AddDepartment")]
+    [Migration("20261126122921_AddDepartment")]
     partial class AddDepartment
     {
         /// <inheritdoc />

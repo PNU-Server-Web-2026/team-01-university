@@ -7,13 +7,13 @@ erDiagram
     Course }o--o{ Course : "пререквізити (M:N)"
     Student ||--o{ Enrollment : "має записи (1:N)"
     Course ||--o{ Enrollment : "містить записи (1:N)"
-    
+    -   **Department (Кафедра):** Реалізовано в таблиці `Departments` (міграція `AddDepartment`). Поля `Name` та `Faculty` обмежені довжиною до 200 символів (`varchar(200)`), `Code` — до 10 символів (`varchar(10)`). На рівні PostgreSQL для `Code` додано унікальний індекс (`IX_Departments_Code`) та check-обмеження `CK_Departments_Code_Format` (`^[A-Z]{2,10}$`).
 
     Department {
         int Id PK
-        string Code "Унікальне, 2-10 великих літер"
-        string Name
-        string Faculty
+        string Name "Обов'язкове, max 200"
+        string Code "Обов'язкове, унікальне, 2-10 великих лат. літер (^[A-Z]{2,10}$)"
+        string Faculty "Необов'язкове, max 200"
     }
 
     Teacher {
