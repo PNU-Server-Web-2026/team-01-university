@@ -1,8 +1,4 @@
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace UniversityManagement.Api.Features.StudyGroups;
 
@@ -27,22 +23,23 @@ public class InMemoryStudyGroupService : IStudyGroupService
     {
         var newId = Interlocked.Increment(ref _idCounter);
         var response = new StudyGroupResponse(newId, request.Name, request.Year, request.Specialty);
-        
+
         _store[newId] = response;
         return Task.FromResult(response);
     }
 
     public Task<bool> UpdateAsync(int id, UpdateStudyGroupRequest request, CancellationToken ct = default)
     {
-        if (!_store.ContainsKey(id))
+        while (_store.TryGetValue(id, out var existing))
         {
-            return Task.FromResult(false);
+            var updatedResponse = new StudyGroupResponse(id, request.Name, request.Year, request.Specialty);
+            if (_store.TryUpdate(id, updatedResponse, existing))
+            {
+                return Task.FromResult(true);
+            }
         }
 
-        var updatedResponse = new StudyGroupResponse(id, request.Name, request.Year, request.Specialty);
-        _store[id] = updatedResponse;
-        
-        return Task.FromResult(true);
+        return Task.FromResult(false);
     }
 
     public Task<bool> DeleteAsync(int id, CancellationToken ct = default)

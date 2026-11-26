@@ -72,16 +72,25 @@ public class StudyGroupsApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
-    public async Task Update_Existing_Returns204()
+    public async Task Update_Existing_Returns204_AndUpdatesFields()
     {
         var createRequest = new CreateStudyGroupRequest("ІПЗ-11", 1, "Інженерія програмного забезпечення");
         var createResponse = await _client.PostAsJsonAsync("/api/study-groups", createRequest);
         var created = await createResponse.Content.ReadFromJsonAsync<StudyGroupResponse>();
 
-        var updateRequest = new UpdateStudyGroupRequest("ІПЗ-12", 1, "Інженерія програмного забезпечення");
+        var updateRequest = new UpdateStudyGroupRequest("ІПЗ-12", 2, "Програмна інженерія");
         var updateResponse = await _client.PutAsJsonAsync($"/api/study-groups/{created!.Id}", updateRequest);
 
         Assert.Equal(HttpStatusCode.NoContent, updateResponse.StatusCode);
+
+        var getResponse = await _client.GetAsync($"/api/study-groups/{created.Id}");
+        Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
+
+        var updated = await getResponse.Content.ReadFromJsonAsync<StudyGroupResponse>();
+        Assert.NotNull(updated);
+        Assert.Equal("ІПЗ-12", updated.Name);
+        Assert.Equal(2, updated.Year);
+        Assert.Equal("Програмна інженерія", updated.Specialty);
     }
 
     [Fact]
@@ -103,5 +112,35 @@ public class StudyGroupsApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         var getResponse = await _client.GetAsync($"/api/study-groups/{created.Id}");
         Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
+    }
+
+    [Fact]
+    public async Task ConcurrentPutAndDelete_DoesNotResurrectDeletedGroup()
+    {
+        for (var i = 0; i < 20; i++)
+        {
+            var createRequest = new CreateStudyGroupRequest($"КН-{100 + i}", 1, "Комп'ютерні науки");
+            var createResponse = await _client.PostAsJsonAsync("/api/study-groups", createRequest);
+            var created = await createResponse.Content.ReadFromJsonAsync<StudyGroupResponse>();
+            var id = created!.Id;
+
+            var putTasks = Enumerable.Range(0, 10)
+                .Select(j => _client.PutAsJsonAsync(
+                    $"/api/study-groups/{id}",
+                    new UpdateStudyGroupRequest($"КН-{100 + i}-{j}", 2, "Комп'ютерні науки")))
+                .ToList();
+
+            var deleteTask = _client.DeleteAsync($"/api/study-groups/{id}");
+
+            var allTasks = putTasks.Concat([deleteTask]);
+            var responses = await Task.WhenAll(allTasks);
+
+            Assert.Contains(responses, r => r.StatusCode == HttpStatusCode.NoContent);
+            Assert.All(responses, r =>
+                Assert.True(r.StatusCode is HttpStatusCode.NoContent or HttpStatusCode.NotFound));
+
+            var finalGet = await _client.GetAsync($"/api/study-groups/{id}");
+            Assert.Equal(HttpStatusCode.NotFound, finalGet.StatusCode);
+        }
     }
 }
