@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using UniversityManagement.Api.Features.Departments;
 
 namespace UniversityManagement.Api.Data;
 
@@ -7,8 +8,10 @@ namespace UniversityManagement.Api.Data;
 /// </summary>
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    // Сутності (DbSet<T>) додаються в задачах, наприклад:
-    // public DbSet<Hotel> Hotels => Set<Hotel>();
+    /// <summary>
+    /// Кафедри університету.
+    /// </summary>
+    public DbSet<Department> Departments => Set<Department>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
