@@ -27,11 +27,14 @@
 ## Швидкий старт
 
 ```bash
-# 1. (Необов'язково) власні налаштування БД
+# 1. Створити файл змінних середовища (обов'язково для pgAdmin та налаштування БД)
 cp .env.example .env
 
-# 2. Запустити PostgreSQL у Docker
+# 2. Запустити лише PostgreSQL у Docker
 docker compose up -d db
+
+# Або запустити PostgreSQL разом із pgAdmin (профіль tools)
+docker compose --profile tools up -d
 
 # 3. Відновити локальні інструменти (dotnet-ef)
 dotnet tool restore
@@ -47,6 +50,7 @@ dotnet test
 
 - http://localhost:5080/api/ping → `{"message":"pong","utc":"..."}`
 - http://localhost:5080/openapi/v1.json → OpenAPI-документ (лише в середовищі Development)
+- http://localhost:5050 → pgAdmin (якщо піднято з --profile tools; логін і пароль беруться з PGADMIN_DEFAULT_EMAIL та PGADMIN_DEFAULT_PASSWORD у .env, сервер бази даних підключається автоматично)
 
 ### Міграції EF Core
 
